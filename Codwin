@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Colour Prediction Betting Game with Payment Gateway</title>
+  <style>
+    /* General styling */
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f2f2f2;
+      padding: 20px;
+      margin: 0;
+    }
+    h1, h2 {
+      background-color: #2c8e99;
+      color: white;
+      padding: 20px;
+      margin: 0;
+    }
+    .game-container, .payment-container {
+      margin: 20px auto;
+      max-width: 400px;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+    label {
+      display: block;
+      margin: 15px 0 5px;
+      font-size: 16px;
+    }
+    input, select {
+      padding: 10px;
+      font-size: 16px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+    #resultMessage, #paymentMessage {
+      font-size: 18px;
+      margin-top: 20px;
+    }
+    #balanceDisplay {
+      font-size: 20px;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Colour Prediction Betting Game</h1>
+  <div class="game-container">
+    <p id="balanceDisplay">Balance: Rs. <span id="balance">1000</span></p>
+    <label for="colorChoice">Choose a Color:</label>
+    <select id="colorChoice">
+      <option value="red">Red</option>
+      <option value="green">Green</option>
+      <option value="blue">Blue</option>
+      <option value="yellow">Yellow</option>
+      <option value="orange">Orange</option>
+      <option value="purple">Purple</option>
+    </select>
+    
+    <label for="betAmount">Bet Amount (Rs.):</label>
+    <input type="number" id="betAmount" value="0" min="1">
+    
+    <button id="placeBet">Place Bet</button>
+    <p id="resultMessage"></p>
+  </div>
+  
+  <div class="payment-container">
+    <h2>Payment Gateway Simulation</h2>
+    <label for="depositAmount">Deposit Amount (Rs.):</label>
+    <input type="number" id="depositAmount" value="0" min="1">
+    <button id="depositButton">Deposit Money</button>
+    
+    <label for="withdrawAmount">Withdraw Amount (Rs.):</label>
+    <input type="number" id="withdrawAmount" value="0" min="1">
+    <button id="withdrawButton">Withdraw Money</button>
+    
+    <p id="paymentMessage"></p>
+  </div>
+
+  <script>
+    let balance = 1000; // Initial balance
+    const colors = ["red", "green", "blue", "yellow", "orange", "purple"];
+
+    // References for game elements
+    const balanceSpan = document.getElementById("balance");
+    const colorChoice = document.getElementById("colorChoice");
+    const betAmountInput = document.getElementById("betAmount");
+    const placeBetButton = document.getElementById("placeBet");
+    const resultMessage = document.getElementById("resultMessage");
+
+    // References for payment elements
+    const depositAmountInput = document.getElementById("depositAmount");
+    const depositButton = document.getElementById("depositButton");
+    const withdrawAmountInput = document.getElementById("withdrawAmount");
+    const withdrawButton = document.getElementById("withdrawButton");
+    const paymentMessage = document.getElementById("paymentMessage");
+
+    // बैलेंस अपडेट करने का फंक्शन
+    function updateBalanceDisplay() {
+      balanceSpan.textContent = balance;
+    }
+
+    // गेम के लिए रैंडम रंग चुनने का फंक्शन
+    function getRandomColor() {
+      const randomIndex = Math.floor(Math.random() * colors.length);
+      return colors[randomIndex];
+    }
+
+    // बेट प्लेस करने का इवेंट लिसनर
+    placeBetButton.addEventListener("click", function() {
+      let bet = parseInt(betAmountInput.value);
+      let chosenColor = colorChoice.value;
+      
+      if (isNaN(bet) || bet <= 0) {
+        resultMessage.textContent = "कृपया सही राशि दर्ज करें!";
+        return;
+      }
+      if (bet > balance) {
+        resultMessage.textContent = "आपके पास पर्याप्त बैलेंस नहीं है!";
+        return;
+      }
+      
+      balance -= bet; // बेट राशि काटना
+      
+      let drawnColor = getRandomColor(); // कंप्यूटर द्वारा रैंडम रंग चुनना
+      
+      if (chosenColor === drawnColor) {
+        let winnings = bet * 2;
+        balance += winnings;
+        resultMessage.textContent = "बधाई हो! चुना गया रंग " + drawnColor + " था। आपने Rs. " + winnings + " जीते!";
+      } else {
+        resultMessage.textContent = "अफसोस! चुना गया रंग " + drawnColor + " था। अगली बार फिर कोशिश करें!";
+      }
+      
+      updateBalanceDisplay();
+    });
+
+    // सिम्युलेटेड डिपॉज़िट फंक्शन
+    depositButton.addEventListener("click", function() {
+      let depositAmount = parseInt(depositAmountInput.value);
+      if (isNaN(depositAmount) || depositAmount <= 0) {
+        paymentMessage.textContent = "कृपया सही राशि दर्ज करें!";
+        return;
+      }
+      
+      paymentMessage.textContent = "डिपॉज़िट प्रोसेस हो रहा है...";
+      // असली पेमेंट गेटवे इंटीग्रेशन के लिए सर्वर-साइड API कॉल की आवश्यकता होगी।
+      setTimeout(() => {
+        balance += depositAmount;
+        updateBalanceDisplay();
+        paymentMessage.textContent = "डिपॉज़िट सफल! आपकी नई बैलेंस Rs. " + balance + " है।";
+      }, 1000); // 1 सेकंड की देरी के साथ प्रोसेसिंग सिम्युलेशन
+    });
+
+    // सिम्युलेटेड विथड्रॉल फंक्शन
+    withdrawButton.addEventListener("click", function() {
+      let withdrawAmount = parseInt(withdrawAmountInput.value);
+      if (isNaN(withdrawAmount) || withdrawAmount <= 0) {
+        paymentMessage.textContent = "कृपया सही राशि दर्ज करें!";
+        return;
+      }
+      if (withdrawAmount > balance) {
+        paymentMessage.textContent = "आपके पास पर्याप्त बैलेंस नहीं है!";
+        return;
+      }
+      
+      paymentMessage.textContent = "विथड्रॉल प्रोसेस हो रहा है...";
+      // असली विथड्रॉल प्रोसेसिंग के लिए बैंक या पेमेंट गेटवे API की आवश्यकता होगी।
+      setTimeout(() => {
+        balance -= withdrawAmount;
+        updateBalanceDisplay();
+        paymentMessage.textContent = "विथड्रॉल सफल! आपकी नई बैलेंस Rs. " + balance + " है।";
+      }, 1000);
+    });
+
+    // पेज लोड पर बैलेंस अपडेट करें
+    updateBalanceDisplay();
+  </script>
+</body>
+</html>
